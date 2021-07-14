@@ -54,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
     private TextureView textureView;
     private ImageView imageView;
 
-    //Check state orientation of output image
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     static{
         ORIENTATIONS.append(Surface.ROTATION_0,90);
@@ -70,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
     private Size imageDimension;
     private ImageReader imageReader;
 
-    //Save to FILE
     private File file;
     private static final int REQUEST_CAMERA_PERMISSION = 200;
     private boolean mFlashSupported;
@@ -103,15 +101,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         textureView = (TextureView)findViewById(R.id.textureView);
-        //From Java 1.4 , you can use keyword 'assert' to check expression true or false
         assert textureView != null;
         textureView.setSurfaceTextureListener(textureListener);
 
         imageView = (ImageView)findViewById(R.id.imageView);
-        //From Java 1.4 , you can use keyword 'assert' to check expression true or false
-
-
-
 
         btnCapture = (Button)findViewById(R.id.btnCapture);
         btnCapture.setOnClickListener(new View.OnClickListener() {
@@ -128,21 +121,10 @@ public class MainActivity extends AppCompatActivity {
         CameraManager manager = (CameraManager)getSystemService(Context.CAMERA_SERVICE);
         try{
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
-            Size[] jpegSizes = null;
-            if(characteristics != null)
-                jpegSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
-                        .getOutputSizes(ImageFormat.JPEG);
 
-            //Capture image with custom size
             int width = 640;
             int height = 480;
-            /*
 
-            if(jpegSizes != null && jpegSizes.length > 0)
-            {
-                width = jpegSizes[0].getWidth();
-                height = jpegSizes[0].getHeight();
-            }*/
             final ImageReader reader = ImageReader.newInstance(width,height,ImageFormat.JPEG,1);
             List<Surface> outputSurface = new ArrayList<>(2);
             outputSurface.add(reader.getSurface());
@@ -152,9 +134,6 @@ public class MainActivity extends AppCompatActivity {
             captureBuilder.addTarget(reader.getSurface());
             captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
 
-
-
-            //Check orientation base on device
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION,ORIENTATIONS.get(rotation));
 
@@ -170,13 +149,10 @@ public class MainActivity extends AppCompatActivity {
                         buffer.get(bytes);
                         save(bytes);
 
-                    }
-                    catch (FileNotFoundException e)
-                    {
+                    } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
-                    catch (IOException e)
-                    {
+                    catch (IOException e) {
                         e.printStackTrace();
                     }
                     finally {
@@ -205,12 +181,10 @@ public class MainActivity extends AppCompatActivity {
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, result);
 
-                    Toast.makeText(MainActivity.this, "Saved "+file, Toast.LENGTH_SHORT).show();
-                    //String filePath= file.getAbsolutePath();
+                    Toast.makeText(MainActivity.this, "Imagen guardada "+file, Toast.LENGTH_SHORT).show();
 
                     showImage(file);
                     createCameraPreview();
-
                 }
             };
 
@@ -258,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
-                    Toast.makeText(MainActivity.this, "Changed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Cambiado", Toast.LENGTH_SHORT).show();
                 }
             },null);
         } catch (CameraAccessException e) {
@@ -268,7 +242,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void showImage(File file) {
         runOnUiThread(new Runnable() {
-
             @Override
             public void run() {
 
@@ -350,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "You can't use camera without permission", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "No se tiene permisos para usar la camara", Toast.LENGTH_SHORT).show();
                 finish();
             }
         }
@@ -384,7 +357,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startBackgroundThread() {
-        mBackgroundThread = new HandlerThread("Camera Background");
+        mBackgroundThread = new HandlerThread("Camara Background");
         mBackgroundThread.start();
         mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
     }
